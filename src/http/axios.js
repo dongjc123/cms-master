@@ -3,9 +3,9 @@ import qs from 'qs'
 
 // 全局配置
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.baseURL = 'http://39.107.91.212:8099';
+// axios.defaults.baseURL = 'http://38.11.91.212:8099';
 // axios.defaults.baseURL = 'http://47.106.245.109:8099';
-// axios.defaults.baseURL = 'http://120.78.164.247:8099';
+axios.defaults.baseURL = 'http://120.78.164.247:8099';
 // axios.defaults.baseURL = 'http://120.78.164.247:8888';
 // axios.defaults.baseURL = 'http://120.77.38.16:8888';
 //axios 保存 cookie

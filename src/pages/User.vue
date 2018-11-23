@@ -2,71 +2,75 @@
 	<div class="user">
 		<!-- 按钮区 -->
 		<div class="btns">
-			<el-button type="primary" size='small' @click='toAddUser'>添加</el-button>
+			<el-button size='mini' @click='toAddUser'>添加</el-button>
 		</div>
 		<!-- 按钮区结束 -->
 		<!-- 数据区 -->
-		<div class="user-tbl" v-loading='loading'>
-  			<el-table
-  			:border='true'
-  			size='small'
-	    	:data='users'
-	    	style="width: 100%">
-	    		<el-table-column
-	        	prop="username"
-	        	label="用户名"
-	        	width="180">
-	    		</el-table-column>
-	    		<el-table-column
-	        	prop="password"
-	        	label="密码"
-	        	width="180">
-	    		</el-table-column>
-	    		<el-table-column
-	        	prop="nickname"
-	        	label="真实姓名"
-	        	width="180">
-	    		</el-table-column>
-	    		<el-table-column
-	        	prop="email"
-	        	label="email">
-	    		</el-table-column>
-	    		<el-table-column
-	        	prop="regTime"
-	        	label="注册时间">
-	    		</el-table-column>
-	    		<el-table-column label="操作" width='100'>
-	      			<template slot-scope='{row}'>
-	      				<i class="fa fa-trash" @click='deleteUser(row.id)'></i>
-	      				<i class="fa fa-pencil" @click='toUpdateUser(row)'></i>
-	      			</template>
-	      		</el-table-column>
-	    	</el-table>
-  		</div>
+		<div class="user_tbl">
+			<ul class="user_list">
+				<li v-for='u in users'>
+					<div class="icons">
+						<i class="fa fa-edit" @click="toUpdateUser(u)"></i>
+						<i class="fa fa-close" @click="deleteUser(u.id)"></i>
+					</div>
+					<div class="photo">
+						<img v-if='u.userface && u.userface.indexOf("http")>=0' :src="u.userface" alt="">
+						<img v-else :src='"http://39.108.81.60:8888/group1/"+u.userface' alt="">
+					</div>
+					<div class="info"> 
+						<div>用户名</div> <div>{{u.username}}</div>
+					</div>
+					<div class="info"> 
+						<div>真实姓名</div> <div>{{u.nickname}}</div> 
+					</div>
+					<div class="info"> 
+						<div>email</div> <div>{{u.email}}</div> 
+					</div>
+					<div class="info"> 
+						<div>状态</div> 
+						<div  class="switch switch-mini"  data-on="primary" data-off="info">
+							<input type="checkbox"/>
+						</div> 
+					</div>
+				</li>
+			</ul>
+		</div>
 		<!-- 数据区结束 -->
-		<!-- 模态框区 -->
+		<!-- 模态框 -->
 		<el-dialog :title="userDialog.title" :visible.sync="userDialog.visible">
-			<!-- {{userDialog.form}} -->
-		  <el-form  :model="userDialog.form">
-		    <el-form-item label="用户名称" label-width="100px">
+			{{userDialog.form}}
+		  <el-form status-icon ref="userForm" :rules='rules' :model="userDialog.form" label-position='left' size='small'>
+		    <el-form-item label="用户名" label-width="100px" prop="username">
 		      <el-input v-model="userDialog.form.username" autocomplete="off"></el-input>
 		    </el-form-item>
-		    <el-form-item label="用户密码" label-width="100px" prop='title'>
-		      <el-input type='password' v-model="userDialog.form.password" autocomplete="off"></el-input>
+		    <el-form-item label="密码" label-width="100px" prop="password">
+		      <el-input v-model="userDialog.form.password" type="password"></el-input>
 		    </el-form-item>
-		    <el-form-item label="真实姓名" label-width="100px" prop='title'>
-		      <el-input v-model="userDialog.form.nickname" autocomplete="off"></el-input>
+		    <el-form-item label="真实姓名" label-width="100px" prop="nickname">
+		      <el-input v-model="userDialog.form.nickname"></el-input>
 		    </el-form-item>
-		    <el-form-item label="用户邮箱" label-width="100px" prop='title'>
-		      <el-input type='email' v-model="userDialog.form.email" autocomplete="off"></el-input>
+				<el-form-item label="email" label-width="100px" prop="email">
+		      <el-input v-model="userDialog.form.email" ></el-input>
+		    </el-form-item>
+		    <el-form-item label="头像" label-width="100px">
+		      <el-upload
+					  action="http://47.107.71.18:8099/manager/file/upload"
+					  :limit='1'
+					  :file-list="userDialog.fileList"
+					  :on-remove='handleUploadRemove'
+					  :on-success='handlerUploadSuccess'
+					  list-type="picture">
+					  <el-button size="mini" type="text">点击上传</el-button>
+					</el-upload>
 		    </el-form-item>
 		  </el-form>
 		  <div slot="footer" class="dialog-footer">
-		    <el-button size='small' @click="closeUserDialog">取 消</el-button>
-		    <el-button size='small' type="primary" @click='saveOrUpdateUser'>确 定</el-button>
+		    <el-button size='mini' @click='closeUserDialog'>取 消</el-button>
+		    <el-button size='mini' type="primary" @click='saveOrUpdateUser'>确 定</el-button>
 		  </div>
 		</el-dialog>
-		<!-- 模态框区结束 -->
+		<!-- 模态框结束 -->
+
 	</div>
 </template>
 <script>
@@ -75,11 +79,35 @@
 		data(){
 			return {
 				users:[],
-				loading:false,
 				userDialog:{
 					title:'',
 					visible:false,
-					form:{}
+					form:{
+
+					},
+					fileList:[]
+				},
+				rules:{
+					username:[{
+						required: true, 
+						message: '请输入用户名',
+						trigger: 'blur' 
+					}],
+					password:[{
+						required: true, 
+						message: '请输入密码',
+						trigger: 'blur' 
+					}],
+					email:[{
+						required: true, 
+						message: '请输入email',
+						trigger: 'blur' 
+					}],
+					nickname:[{
+						required: true, 
+						message: '请输入真实姓名',
+						trigger: 'blur' 
+					}]
 				}
 			}
 		},
@@ -87,119 +115,191 @@
 			this.findAllUsers();
 		},
 		methods:{
-			//修改
-			toUpdateUser(row){
-				this.userDialog.title = '修改用户';
-				this.userDialog.visible = true;
-				let u = _.cloneDeep(row);
-				this.userDialog.form = u;
-				for(let key in u){
-					let val = u[key]
-					if(!val){
-						delete u[key];
-					}
-				}
+			handleUploadRemove(){
+
 			},
-			//删除
+			handlerUploadSuccess(response){
+				this.userDialog.form.userface = response.data.id;
+			},
 			deleteUser(id){
-				this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-		          confirmButtonText: '确定',
-		          cancelButtonText: '取消',
-		          type: 'warning'
-		        })
-		        .then(()=>{
-		        	let url = '/manager/user/deleteUserById?id='+id;
-		        	axios.get(url)
-		        	.then(({data:result})=>{
-		        		this.$notify({
-					        title: '删除成功',
-					        message: result.message,
-					        type: 'success'
-					    });
-					    this.findAllUsers();
-		        	})
-		        	.catch(()=>{
-		        		alert(1);
-		        		this.$notify.error({
-				          title: '错误',
-				          message: '删除异常'
-				        });
-		        	});
-		        })
-		        .catch(()=>{});
+				this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        .then(()=>{
+        	let url = '/manager/user/deleteUserById';
+        	axios.get(url,{params:{id }})
+        	.then(({data:result})=>{
+        		this.$notify({
+		          title: '成功',
+		          message: result.message,
+		          type: 'success'
+		        });
+		        this.findAllUsers();
+        	})
+        	.catch(()=>{
+        		this.$notify.error({
+		          title: '错误',
+		          message: '删除异常'
+		        });
+        	});
+        })
+        .catch(()=>{});
 			},
-			//保存或更新用户
 			saveOrUpdateUser(){
-				let url = '/manager/user/saveOrUpdateUser'
-				axios.post(url,this.userDialog.form)
-				.then(({data:result})=>{
-					if(result.status == 200){
-						this.closeUserDialog();
-						this.$notify({
-					        title: '成功',
-					        message: result.message,
-					        type: 'success'
-					    });
-					    //3.刷新
-					    this.findAllUsers();
-		  			} else {
-		  				this.$notify.error({
-				          title: '错误1',
-				          message: result.message
-				        });
-		  			}
-		  		})
-		  		.catch((error)=>{
-		  			this.$notify.error({
-				          title: '错误2',
-				          message: '网络异常'
-				        });
-		  		});
+				this.$refs.userForm.validate((valid)=>{
+
+					for(let key in this.userDialog.form){
+						let val = this.userDialog.form[key]
+						if(!val){
+							delete this.userDialog.form[key]
+						}
+					}
+
+					if(valid){
+						let url = '/manager/user/saveOrUpdateUser'
+						axios.post(url,this.userDialog.form)
+						.then(({data:result})=>{
+							if(result.status = 200){
+								//1. 关闭模态框
+								this.closeUserDialog();
+								//2. 提示成功
+								this.$notify({title: '成功', message: result.message, type: 'success'});
+				        //3. 刷新
+								this.findAllUsers();
+							} else {
+								this.$notify.error({title: '错误', message: result.message });
+							}
+						})
+						.catch((error)=>{
+							this.$notify.error({title: '错误', message: '网络异常'});
+						});
+					}
+				})
 			},
-			//关闭模态框
 			closeUserDialog(){
+				this.$refs.userForm.resetFields()
+				this.userDialog.form = {};
 				this.userDialog.visible = false;
 			},
-			//添加用户
-			toAddUser(){
-				this.userDialog.form = {};
-				this.userDialog.title = '添加用户';
+			toUpdateUser(u){
+				this.userDialog.form = u;
+				if(u.userface){
+					if(u.userface.indexOf('http')>=0){
+						this.userDialog.fileList = [{
+							name:u.userface,
+							url:u.userface
+						}]
+					} else {
+						this.userDialog.fileList = [{
+							name:u.userface,
+							url:'http://39.108.81.60:8888/group1/'+u.userface
+						}]
+					}
+				}
+
+				
+
+				this.userDialog.title = '修改用户';
 				this.userDialog.visible = true;
 			},
-			//查找所有用户
+			toAddUser(){
+				this.userDialog.title = '添加用户';
+				this.userDialog.fileList = [];
+				this.userDialog.visible = true;
+			},
 			findAllUsers(){
-				this.loading = true;
 				let url = '/manager/user/findAllUser';
 				axios.get(url).then(({data:result})=>{
 					// 将查询到的数据绑定到模型中
 					this.users = result.data;
 				}).catch((error)=>{
-		  			console.log('error',error);
-		  		}).finally(()=>{
-		  			this.loading = false;
-		  		});
-			},
+					this.$notify.error({title: '错误', message: result.message });
+				})
+			}
 		}
 	}
 </script>
 
-<style scoped>
+<style>
 	.btns {
 		margin-bottom: .5em;
 	}
+	.user_list {
+
+	}
+	.user_list > li {
+		box-sizing: border-box;
+		width: 24.25%;
+		float: left;
+		margin-right:1%;
+		border:1px solid #ededed;
+		margin-bottom: .5em;
+		height: 300px;
+		padding: .5em;
+		border-radius: 5px;
+		position: relative;
+		background-color: #ededed;
+	}
+	.user_list > li:nth-child(4n){
+		margin-right: 0;
+	}
+
+	.user_list > li .icons {
+		position: absolute;
+		right: .5em;
+		top: .5em;
+		display: none;
+	}
+	.user_list > li:hover{
+		box-shadow: 5px 5px 5px 5px  #888888;
+	}
+	.user_list > li:hover .icons{
+		display: block;
+	}
 	i.fa {
-		margin: 0 .8em;
+		margin: 0 .3em;
 		cursor: pointer;;
 	}
-	i.fa.fa-trash {
-		color: #F56C6C;
-	}
-	i.fa.fa-pencil {
-		color: #409eff;
-	}
-	.user-tbl:hover{
+	.user_list .photo {
+		width: 120px;
+		height: 120px;
+		margin:0 auto;
+		border-radius: 50%;
+		overflow: hidden;
 		
 	}
+	.user_list .photo img {
+		width: 100%;
+	}
+	.user_list .info {
+	}
+	.user_list .info::after {
+		content: '';
+		display: block;
+		clear: both;
+	}
+	.user_list .info > div {
+		float: left;
+		padding: 0 1em;
+		line-height: 2em;
+	}
+	.user_list .info > div:first-child{
+		width: 35%;
+
+		text-align: right;
+	}
+	.user_list .info > div:last-child{
+		width: 65%;
+		text-align: left;
+	}
+	.user {
+		min-width: 800px;
+		
+	}
+	
+
 </style>
 
 

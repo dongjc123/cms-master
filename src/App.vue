@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <!-- 头 -->
-    <div class="header">
+    <div class="header note" :style="note">
       <div class="title">
         <i class="fa fa-newspaper-o"></i> &nbsp;&nbsp;热点新闻资讯
       </div>
@@ -44,6 +44,11 @@
             <router-link to='/user'>用户管理</router-link>
             <i class="fa fa-angle-right"></i>
           </li>
+          <li :class="{current:currentRoute.indexOf('/setting')>=0}">
+            <i class="fa fa-cog"></i>
+            <router-link to='/setting'>系统设置</router-link>
+            <i class="fa fa-angle-right"></i>
+          </li>
         </ul>
 
       </div>
@@ -52,8 +57,16 @@
         <div class="wrapper">
           <router-view></router-view>
         </div>
-      </div>
+        
+      </div>      
     </div>
+    <!-- 底部 -->
+   <!--  <div class="footer">
+      <span><img src="./assets/国标.gif"></span>
+      
+      <span>huiasdhf</span>
+    </div> -->
+    
   </div>
 </template>
 <script>
@@ -62,7 +75,13 @@
     data(){
       return {
         currentRoute:'/',
-        user:{}
+        user:{},
+        note: { 
+          backgroundImage: "url(" + require("./assets/login-bg.jpg") + ") ",
+          backgroundPosition: "center center", 
+          backgroundRepeat: "no-repeat", 
+          backgroundSize: "cover", 
+        },
       }
     },
     watch:{
@@ -145,7 +164,8 @@
     margin-top: 30px;
   }
   .header .info .el-dropdown {
-    color: #fff;
+    font-size: 20px;
+    color: #f0f0f0;
   }
   .center {
     position: absolute;
@@ -189,10 +209,10 @@
     background-color: #f0f0f0;
   }
   .center > .left-nav > ul > li.current > i.fa{
-    color: #000;
+    color: blue;
   }
   .center > .left-nav > ul > li.current > a{
-    color: #000;
+    color: blue;
 
   }
   .center > .content {
@@ -207,6 +227,24 @@
     height: 100%;
     background-color: #ffffff;
     border-radius: 5px;
+    /*position: absolute;*/
     padding: .5em;
   }
+  .footer{
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    background-color: #ccc;
+    position: absolute;
+    bottom: 0;
+  }
+  
+  .footer span img{
+    /*margin: 5px;*/
+    /*line-height: 40px;*/
+    margin-top: 5px;
+    width: 25px;
+    height: 25px;
+  };
 </style>

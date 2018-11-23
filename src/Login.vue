@@ -1,9 +1,9 @@
 <template>
-	<div class="login">
+	<div class="login note1" :style="note1">
 		<div class="bg">
 			<h3>热点新闻资讯</h3>
 		</div>
-		<div class="login-dialog">
+		<div class="login-dialog note2" :style="note2">
 			<div class="title">
 				<h2>登录页</h2>
 			</div>
@@ -45,7 +45,19 @@
 			    		message:'请输入密码',
 			    		tirgger:'blur'
 			    	}]
-			    }
+			    },
+			    note1: { 
+		          backgroundImage: "url(" + require("./assets/login.jpg") + ") ",
+		          backgroundPosition: "center center", 
+		          backgroundRepeat: "no-repeat", 
+		          backgroundSize: "cover", 
+		        },
+		        note2: { 
+		          backgroundImage: "url(" + require("./assets/tx.jpg") + ") ",
+		          backgroundPosition: "center center", 
+		          backgroundRepeat: "no-repeat", 
+		          backgroundSize: "cover", 
+		        },
 			}
 		},
 		methods:{
@@ -87,9 +99,9 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-image:url('./assets/login.jpg');
-        background-repeat: no-repeat;
-        background-size:100%;
+		/*background-image:url('./assets/login.jpg');*/
+        /*background-repeat: no-repeat;*/
+        /*background-size:100%;*/
 	}
 	
 	.login .bg h3 {
@@ -107,9 +119,9 @@
 		margin-top: 7em;
 		border: 1px solid #ccc;
 		border-radius: 10px;
-		background-image:url('./assets/tx.jpg');
-        background-repeat: no-repeat;
-        background-size:100%;
+		/*background-image:url('./assets/tx.jpg');*/
+        /*background-repeat: no-repeat;*/
+        /*background-size:100%;*/
 		
 	}
 	.login .login-dialog:hover{
@@ -118,6 +130,7 @@
 	.login .title {
 		margin-bottom: 2em;
 	}
+	
 	.login .btn {
 		text-align: center;
 		margin-top: 2em;
